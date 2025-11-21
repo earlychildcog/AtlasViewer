@@ -40,7 +40,12 @@ classdef Logger < handle
             % Check if log file for this application already exists - if it does close any open handles and delete it 
             % so you can start fresh
             if exist(self.filename, 'file') == 2
-                fds = openedFiles;
+                % from version 2025b fopen('all') throws an error, this check ensure compatibility with both latest and older versions
+                if feval(@(x)str2double(x(1:end-1)) > 2023, version("-release"))
+                    fds = openedFiles;
+                else
+                    fds = fopen('all');
+                end
                 for ii = 1:length(fds)
                     filename = fopen(fds(ii));
                     if pathscompare(filename, self.filename)
